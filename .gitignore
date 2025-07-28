@@ -1,0 +1,166 @@
+# Kolosal AI RMS - GitIgnore File
+
+# Docker & Compose
+.docker/
+docker-compose.override.yml
+.env.local
+.env.*.local
+
+# Data directories  
+data/
+volumes/
+logs/
+backups/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+tmp/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+*.sublime-*
+
+# Node.js (for dashboard development)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.npm
+.yarn/
+dist/
+build/
+
+# Python (for MarkItDown development)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+.env
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.cache
+
+# Rust (for potential Qdrant customizations)
+target/
+**/*.rs.bk
+Cargo.lock
+*.pdb
+
+# Configuration overrides
+config/custom/
+config/local/
+config/*.local.*
+searxng/settings.local.yml
+
+# SSL Certificates
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+ssl/
+certs/
+
+# Backup files
+*.backup
+*.bak
+*.orig
+backup-*
+*.sql.gz
+
+# Logs
+*.log
+logs/
+log/
+*.log.*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Docker volumes data
+qdrant_storage/
+valkey_data/
+searxng_data/
+
+# Development databases
+*.db
+*.sqlite
+*.sqlite3
+
+# MacOS
+.AppleDouble
+.LSOverride
+Icon
+
+# Windows
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Archive files (unless needed for deployment)
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Sensitive files
+secrets/
+.secrets
+credentials/
+.credentials
+.password
+.token
+.key
+
+# Test files
+test-data/
+testing/
+*.test
+coverage/
+
+# Documentation build
+docs/_build/
+site/

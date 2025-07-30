@@ -66,7 +66,7 @@ services:
     build: https://github.com/KolosalAI/Kolosal-RMS-MarkItDown.git#main
     container_name: kolosal-markitdown
     ports:
-      - "0.0.0.0:8001:8001"
+      - "0.0.0.0:8081:8081"
     environment:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
@@ -103,7 +103,7 @@ services:
       - NODE_ENV=production
       - QDRANT_URL=http://qdrant:6333
       - SEARXNG_URL=http://searxng:8080
-      - MARKITDOWN_URL=http://markitdown:8001
+      - MARKITDOWN_URL=http://markitdown:8081
       - KOLOSAL_SERVER_URL=http://kolosal-server:8084
     depends_on:
       - qdrant

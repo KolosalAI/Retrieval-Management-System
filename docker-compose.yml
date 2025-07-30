@@ -68,7 +68,7 @@ services:
 
   # MarkItDown Service
   markitdown:
-    build: https://github.com/KolosalAI/Kolosal-RMS-MarkItDown.git
+    build: https://github.com/KolosalAI/Kolosal-RMS-MarkItDown.git#main
     container_name: kolosal-markitdown
     ports:
       - "8001:8001"

@@ -110,6 +110,9 @@ qdrant_storage/
 valkey_data/
 searxng_data/
 
+# Services cloned by setup scripts
+services/
+
 # Development databases
 *.db
 *.sqlite

@@ -100,7 +100,7 @@ services:
 
   # Dashboard Service
   dashboard:
-    build: https://github.com/KolosalAI/Kolosal-RMS-Dashboard.git
+    build: https://github.com/KolosalAI/Kolosal-RMS-Dashboard.git#main
     container_name: kolosal-dashboard
     ports:
       - "3000:3000"

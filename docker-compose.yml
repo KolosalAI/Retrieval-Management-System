@@ -3,9 +3,6 @@ services:
   qdrant:
     image: qdrant/qdrant:latest
     container_name: kolosal-qdrant
-    ports:
-      - "6333:6333"
-      - "6334:6334"
     volumes:
       - qdrant_storage:/qdrant/storage
     environment:
@@ -19,8 +16,6 @@ services:
   searxng:
     image: searxng/searxng:latest
     container_name: kolosal-searxng
-    ports:
-      - "8090:8080"
     environment:
       - SEARXNG_BASE_URL=http://localhost:8090/
       - SEARXNG_SECRET_KEY=ultrasecretkey-change-this-in-production
@@ -71,7 +66,7 @@ services:
     build: https://github.com/KolosalAI/Kolosal-RMS-MarkItDown.git#main
     container_name: kolosal-markitdown
     ports:
-      - "8001:8001"
+      - "0.0.0.0:8001:8001"
     environment:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
@@ -83,7 +78,7 @@ services:
     build: https://github.com/KolosalAI/kolosal-server.git#docker
     container_name: kolosal-server
     ports:
-      - "8084:8084"
+      - "0.0.0.0:8084:8084"
     volumes:
       - ./models:/app/models
     environment:
@@ -103,7 +98,7 @@ services:
     build: https://github.com/KolosalAI/Kolosal-RMS-Dashboard.git#main
     container_name: kolosal-dashboard
     ports:
-      - "3000:3000"
+      - "0.0.0.0:3000:3000"
     environment:
       - NODE_ENV=production
       - QDRANT_URL=http://qdrant:6333

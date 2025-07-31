@@ -2,7 +2,6 @@ services:
   # Qdrant Vector Database
   qdrant:
     image: qdrant/qdrant:latest
-    container_name: kolosal-qdrant
     volumes:
       - qdrant_storage:/qdrant/storage
     environment:
@@ -15,9 +14,10 @@ services:
   # SearXNG Internet Search
   searxng:
     image: searxng/searxng:latest
-    container_name: kolosal-searxng
+    ports:
+      - "8090:8080"
     environment:
-      - SEARXNG_BASE_URL=http://localhost:8090/
+      - SEARXNG_BASE_URL=http://searxng:8080/
       - SEARXNG_SECRET_KEY=ultrasecretkey-change-this-in-production
       - SEARXNG_REDIS_URL=redis://redis:6379/0
     volumes:
@@ -42,7 +42,6 @@ services:
   # Redis for SearXNG
   redis:
     image: redis:alpine
-    container_name: kolosal-redis
     command: redis-server --save 30 1 --loglevel warning
     volumes:
       - redis_data:/data
@@ -64,9 +63,8 @@ services:
   # MarkItDown Service
   markitdown:
     build: https://github.com/KolosalAI/Kolosal-RMS-MarkItDown.git#main
-    container_name: kolosal-markitdown
     ports:
-      - "0.0.0.0:8081:8081"
+      - "8081:8081"
     environment:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
@@ -76,9 +74,8 @@ services:
   # Kolosal Server (AI Inference Engine)
   kolosal-server:
     build: https://github.com/KolosalAI/kolosal-server.git#docker
-    container_name: kolosal-server
     ports:
-      - "0.0.0.0:8084:8084"
+      - "8084:8084"
     volumes:
       - ./models:/app/models
     environment:
@@ -96,9 +93,8 @@ services:
   # Dashboard Service
   dashboard:
     build: https://github.com/KolosalAI/Kolosal-RMS-Dashboard.git#main
-    container_name: kolosal-dashboard
     ports:
-      - "0.0.0.0:3000:3000"
+      - "3000:3000"
     environment:
       - NODE_ENV=production
       - QDRANT_URL=http://qdrant:6333

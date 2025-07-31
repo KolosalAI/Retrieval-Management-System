@@ -39,7 +39,7 @@ def create_documents_collection(url: str) -> bool:
     """Create the documents collection with appropriate configuration."""
     collection_config = {
         "vectors": {
-            "size": 1536,  # Standard OpenAI embedding size
+            "size": 2560,  # Standard OpenAI embedding size
             "distance": "Cosine"
         },
         "optimizers_config": {

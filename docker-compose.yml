@@ -84,6 +84,15 @@ services:
     networks:
       - kolosal-network
 
+  # Docling Service
+  docling:
+    image: quay.io/docling-project/docling-serve-cpu
+    ports:
+      - "8002:5001"
+    restart: unless-stopped
+    networks:
+      - kolosal-network
+
   # Kolosal Server (AI Inference Engine)
   kolosal-server:
     build: https://github.com/KolosalAI/kolosal-server.git#docker

@@ -88,7 +88,7 @@ services:
   docling:
     image: quay.io/docling-project/docling-serve-cpu
     ports:
-      - "8002:5001"
+      - "8082:5001"
     restart: unless-stopped
     networks:
       - kolosal-network
@@ -122,7 +122,7 @@ services:
       - QDRANT_URL=http://qdrant:6333
       - SEARXNG_URL=http://searxng:8080
       - MARKITDOWN_SERVER_URL=http://markitdown:8081
-      - DOCLING_SERVER_URL=http://docling:5001
+      - DOCLING_SERVER_URL=http://docling:8082
       - KOLOSAL_SERVER_URL=http://kolosal-server:8084
     depends_on:
       - qdrant

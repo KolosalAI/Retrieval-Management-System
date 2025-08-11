@@ -95,7 +95,7 @@ services:
 
   # Kolosal Server (AI Inference Engine)
   kolosal-server:
-    build: https://github.com/KolosalAI/kolosal-server.git#docker
+    build: https://github.com/KolosalAI/kolosal-server.git#docker-server
     ports:
       - "8084:8084"
     volumes:

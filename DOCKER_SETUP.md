@@ -24,11 +24,11 @@ cd Retrieval-Management-System
 docker-compose up -d
 ```
 
-That's it! All services will be built directly from their GitHub repositories.
+That's it! All services will be pulled from prebuilt images on GHCR or official registries.
 
 ## Architecture Overview
 
-The system consists of 5 main services built directly from GitHub:
+The system consists of 5 main services (prebuilt images):
 
 ### Core Services
 
@@ -44,7 +44,7 @@ The system consists of 5 main services built directly from GitHub:
    - Official Qdrant Docker image
    - Stores document embeddings for RAG operations
 
-4. **MarkItDown** (Port 8001)
+4. **MarkItDown** (Port 8081)
    - Built from [Kolosal-RMS-MarkItDown](https://github.com/KolosalAI/Kolosal-RMS-MarkItDown)
    - Converts documents to markdown
 
@@ -60,7 +60,7 @@ After starting services, access them at:
 - **Kolosal Server**: <http://localhost:8084>
 - **Qdrant**: <http://localhost:6333>
 - **SearXNG**: <http://localhost:8090>
-- **MarkItDown**: <http://localhost:8001>
+- **MarkItDown**: <http://localhost:8081>
 
 ## Managing Services
 
@@ -112,7 +112,7 @@ models/
 
 ### Common Issues
 
-1. **Port conflicts**: Check if ports 3000, 6333, 8084, 8090, 8001 are available
+1. **Port conflicts**: Check if ports 3000, 6333, 8084, 8090, 8081 are available
 2. **Memory issues**: Ensure at least 4GB RAM is available
 3. **Build failures**: Try `docker-compose build --no-cache`
 
@@ -124,7 +124,7 @@ docker-compose ps
 # Test service endpoints
 curl http://localhost:8084/health  # Kolosal Server
 curl http://localhost:6333/health  # Qdrant
-curl http://localhost:8001/health  # MarkItDown
+curl http://localhost:8081/health  # MarkItDown
 ```
 
 ## Data Storage

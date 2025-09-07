@@ -52,14 +52,14 @@ cd Retrieval-Management-System
 docker-compose up -d
 ```
 
-All services will be automatically built from their respective GitHub repositories. No setup scripts or submodules needed!
+All services will be pulled from prebuilt images on GHCR or official registries. No setup scripts or submodules needed!
 
 #### Access Services:
 - **Dashboard**: http://localhost:3000
 - **Kolosal Server (AI Inference)**: http://localhost:8084
 - **Qdrant Vector DB**: http://localhost:6333
 - **SearXNG Search**: http://localhost:8090
-- **MarkItDown API**: http://localhost:8001
+- **MarkItDown API**: http://localhost:8081
 
 For detailed Docker setup instructions, see [DOCKER_SETUP.md](DOCKER_SETUP.md).
 

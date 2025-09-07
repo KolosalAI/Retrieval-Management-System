@@ -16,7 +16,7 @@ services:
 
   # Qdrant Initialization Service
   qdrant-init:
-    build: ./qdrant-init
+  image: ghcr.io/kolosalai/qdrant-init:v0.0.1
     depends_on:
       - qdrant
     environment:
@@ -75,7 +75,7 @@ services:
 
   # MarkItDown Service
   markitdown:
-    build: https://github.com/KolosalAI/Kolosal-RMS-MarkItDown.git#main
+    image: ghcr.io/kolosalai/markitdown-api:v0.0.1
     ports:
       - "8081:8081"
     environment:
@@ -95,7 +95,7 @@ services:
 
   # Kolosal Server (AI Inference Engine)
   kolosal-server:
-    build: https://github.com/KolosalAI/kolosal-server.git#docker
+    image: ghcr.io/kolosalai/kolosal-server:v0.0.1
     ports:
       - "8084:8084"
     volumes:
@@ -104,7 +104,7 @@ services:
       - SERVER_HOST=0.0.0.0
       - SERVER_PORT=8084
       - QDRANT_URL=http://qdrant:6333
-      - SEARXNG_URL=http://searxng:8080
+      - SEARXNG_URL=http://searxng:8090
     depends_on:
       - qdrant
       - searxng
@@ -114,16 +114,14 @@ services:
 
   # Dashboard Service
   dashboard:
-    build: https://github.com/KolosalAI/Kolosal-RMS-Dashboard.git#main
+    image: ghcr.io/kolosalai/dashboard:v0.0.1
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=production
-      - QDRANT_URL=http://qdrant:6333
-      - SEARXNG_URL=http://searxng:8080
-      - MARKITDOWN_SERVER_URL=http://markitdown:8081
-      - DOCLING_SERVER_URL=http://docling:5001
-      - KOLOSAL_SERVER_URL=http://kolosal-server:8084
+      - PORT=3000
+      - API_BASE_URL=http://kolosal-server:8084
+      - DOCLING_BASE_URL=http://docling:5001
+      - MARKITDOWN_BASE_URL=http://markitdown:8081
     depends_on:
       - qdrant
       - searxng

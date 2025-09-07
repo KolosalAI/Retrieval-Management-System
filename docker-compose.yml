@@ -69,7 +69,7 @@ services:
       - "3000:3000"
     environment:
       - PORT=3000
-      - API_BASE_URL=http://kolosal-server:8080
+      - API_BASE_URL=http://kolosal-server:8084
       - DOCLING_BASE_URL=http://docling:5001
       - MARKITDOWN_BASE_URL=http://markitdown:8081
     depends_on:

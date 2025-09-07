@@ -26,6 +26,42 @@ docker-compose up -d
 
 That's it! All services will be pulled from prebuilt images on GHCR or official registries.
 
+## Run with a specific HOST_IP
+
+The dashboard makes API calls from your browser. If you want other devices on your network to access the APIs via your machine's IP, set HOST_IP when starting the stack.
+
+### Windows PowerShell (recommended)
+
+```powershell
+$env:HOST_IP="<IP_ADDRESS>"; docker compose up -d
+```
+
+Example:
+
+```powershell
+$env:HOST_IP="192.168.1.50"; docker compose up -d
+```
+
+### macOS/Linux (bash/zsh)
+
+```bash
+HOST_IP=<IP_ADDRESS> docker compose up -d
+```
+
+### Using a .env file
+
+Create a file named `.env` next to `docker-compose.yml` with:
+
+```env
+HOST_IP=<IP_ADDRESS>
+```
+
+Then start normally:
+
+```powershell
+docker compose up -d
+```
+
 ## Architecture Overview
 
 The system consists of 4 main services (prebuilt images):

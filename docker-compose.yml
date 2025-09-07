@@ -25,54 +25,6 @@ services:
       - kolosal-network
     restart: "no"
 
-  # SearXNG Internet Search
-  searxng:
-    image: searxng/searxng:latest
-    ports:
-      - "8090:8090"
-    environment:
-      - SEARXNG_BASE_URL=http://searxng:8090/
-      - SEARXNG_REDIS_URL=redis://redis:6379/0
-    volumes:
-      - searxng_data:/etc/searxng
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - SETGID
-      - SETUID
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1m"
-        max-file: "1"
-    depends_on:
-      - redis
-    restart: unless-stopped
-    networks:
-      - kolosal-network
-
-  # Redis for SearXNG
-  redis:
-    image: redis:alpine
-    command: redis-server --save 30 1 --loglevel warning
-    volumes:
-      - redis_data:/data
-    cap_drop:
-      - ALL
-    cap_add:
-      - SETGID
-      - SETUID
-      - DAC_OVERRIDE
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1m"
-        max-file: "1"
-    restart: unless-stopped
-    networks:
-      - kolosal-network
-
   # MarkItDown Service
   markitdown:
     image: ghcr.io/kolosalai/markitdown-api:v0.0.1
@@ -104,10 +56,8 @@ services:
       - SERVER_HOST=0.0.0.0
       - SERVER_PORT=8084
       - QDRANT_URL=http://qdrant:6333
-      - SEARXNG_URL=http://searxng:8090
     depends_on:
       - qdrant
-      - searxng
     restart: unless-stopped
     networks:
       - kolosal-network
@@ -124,7 +74,6 @@ services:
       - MARKITDOWN_BASE_URL=http://markitdown:8081
     depends_on:
       - qdrant
-      - searxng
       - markitdown
       - kolosal-server
     restart: unless-stopped
@@ -133,8 +82,6 @@ services:
 
 volumes:
   qdrant_storage:
-  redis_data:
-  searxng_data:
 
 networks:
   kolosal-network:

@@ -28,7 +28,7 @@ That's it! All services will be pulled from prebuilt images on GHCR or official 
 
 ## Architecture Overview
 
-The system consists of 5 main services (prebuilt images):
+The system consists of 4 main services (prebuilt images):
 
 ### Core Services
 
@@ -48,9 +48,7 @@ The system consists of 5 main services (prebuilt images):
    - Built from [Kolosal-RMS-MarkItDown](https://github.com/KolosalAI/Kolosal-RMS-MarkItDown)
    - Converts documents to markdown
 
-5. **SearXNG** (Port 8090)
-   - Built from [searxng-docker](https://github.com/searxng/searxng-docker)
-   - Privacy-respecting internet search
+<!-- Internet search (e.g., SearXNG) can be added separately if needed. -->
 
 ## Service URLs
 
@@ -59,22 +57,24 @@ After starting services, access them at:
 - **Dashboard**: <http://localhost:3000>
 - **Kolosal Server**: <http://localhost:8084>
 - **Qdrant**: <http://localhost:6333>
-- **SearXNG**: <http://localhost:8090>
 - **MarkItDown**: <http://localhost:8081>
 
 ## Managing Services
 
 ### Start all services
+
 ```bash
 docker-compose up -d
 ```
 
 ### Stop all services
+
 ```bash
 docker-compose down
 ```
 
 ### View logs
+
 ```bash
 # All services
 docker-compose logs -f
@@ -84,11 +84,13 @@ docker-compose logs -f kolosal-server
 ```
 
 ### Restart a service
+
 ```bash
 docker-compose restart kolosal-server
 ```
 
 ### Rebuild a service (with latest code)
+
 ```bash
 docker-compose build kolosal-server --no-cache
 docker-compose up -d kolosal-server
@@ -101,7 +103,8 @@ docker-compose up -d kolosal-server
 3. Models will be automatically detected and available through the API
 
 Example models directory:
-```
+
+```text
 models/
 ├── llama-2-7b-chat.q4_0.gguf
 ├── mistral-7b-instruct.q4_0.gguf
@@ -112,11 +115,12 @@ models/
 
 ### Common Issues
 
-1. **Port conflicts**: Check if ports 3000, 6333, 8084, 8090, 8081 are available
+1. **Port conflicts**: Check if ports 3000, 6333, 8084, 8081 are available
 2. **Memory issues**: Ensure at least 4GB RAM is available
 3. **Build failures**: Try `docker-compose build --no-cache`
 
 ### Service Health Checks
+
 ```bash
 # Check service status
 docker-compose ps
@@ -130,8 +134,8 @@ curl http://localhost:8081/health  # MarkItDown
 ## Data Storage
 
 ### Persistent Volumes
+
 - `qdrant_storage`: Qdrant vector database data
-- `redis_data`: Redis cache data
 - `./models`: AI model files (host directory)
 
 ## Benefits of This Approach

@@ -31,11 +31,11 @@ Kolosal AI Retrieval Management System is an integrated, all-in-one solution com
 
 This system integrates the following components:
 
-- **[Kolosal AI Inference Engine](https://github.com/KolosalAI/kolosal-server)** - LLM inference server (docker branch)
-- **[Kolosal RMS Dashboard](https://github.com/KolosalAI/Kolosal-RMS-Dashboard)** - Web-based management interface
-- **[Kolosal RMS MarkItDown](https://github.com/KolosalAI/Kolosal-RMS-MarkItDown)** - Document parsing service
+- **[Kolosal AI Inference Engine](https://github.com/KolosalAI/kolosal-server)** - LLM inference server (prebuilt image)
+- **[Kolosal RMS Dashboard](https://github.com/KolosalAI/Kolosal-RMS-Dashboard)** - Web-based management interface (prebuilt image)
+- **[Kolosal RMS MarkItDown](https://github.com/KolosalAI/Kolosal-RMS-MarkItDown)** - Document parsing service (prebuilt image)
 - **[Qdrant Vector Database](https://github.com/qdrant/qdrant)** - High-performance vector database
-- **[SearXNG Docker](https://github.com/searxng/searxng-docker)** - Privacy-respecting search engine
+<!-- Internet search is optional and not included by default -->
 
 ## Getting Started
 
@@ -58,7 +58,6 @@ All services will be pulled from prebuilt images on GHCR or official registries.
 - **Dashboard**: http://localhost:3000
 - **Kolosal Server (AI Inference)**: http://localhost:8084
 - **Qdrant Vector DB**: http://localhost:6333
-- **SearXNG Search**: http://localhost:8090
 - **MarkItDown API**: http://localhost:8081
 
 For detailed Docker setup instructions, see [DOCKER_SETUP.md](DOCKER_SETUP.md).
@@ -69,4 +68,5 @@ For detailed Docker setup instructions, see [DOCKER_SETUP.md](DOCKER_SETUP.md).
 
 
 ## License
+
 This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.

@@ -49,12 +49,12 @@ services:
   kolosal-server:
     image: ghcr.io/kolosalai/kolosal-server:v0.0.1
     ports:
-      - "8084:8084"
+      - "8084:8080"
     volumes:
       - ./models:/app/models
     environment:
       - SERVER_HOST=0.0.0.0
-      - SERVER_PORT=8084
+      - SERVER_PORT=8080
       - QDRANT_URL=http://qdrant:6333
     depends_on:
       - qdrant
@@ -69,7 +69,7 @@ services:
       - "3000:3000"
     environment:
       - PORT=3000
-      - API_BASE_URL=http://kolosal-server:8084
+      - API_BASE_URL=http://kolosal-server:8080
       - DOCLING_BASE_URL=http://docling:5001
       - MARKITDOWN_BASE_URL=http://markitdown:8081
     depends_on:

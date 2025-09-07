@@ -16,7 +16,7 @@ services:
 
   # Qdrant Initialization Service
   qdrant-init:
-  image: ghcr.io/kolosalai/qdrant-init:v0.0.1
+    image: ghcr.io/kolosalai/qdrant-init:v0.0.1
     depends_on:
       - qdrant
     environment:

@@ -48,14 +48,23 @@ services:
   # Kolosal Server (AI Inference Engine)
   kolosal-server:
     image: ghcr.io/kolosalai/kolosal-server:v0.0.1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              count: all
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8080
+      - QDRANT_URL=http://qdrant:6333
     ports:
       - "8084:8080"
     volumes:
       - ./models:/app/models
-    environment:
-      - SERVER_HOST=0.0.0.0
-      - SERVER_PORT=8080
-      - QDRANT_URL=http://qdrant:6333
     depends_on:
       - qdrant
     restart: unless-stopped

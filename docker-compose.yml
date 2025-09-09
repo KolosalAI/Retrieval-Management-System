@@ -47,7 +47,7 @@ services:
 
   # Kolosal Server (AI Inference Engine)
   kolosal-server:
-  image: ghcr.io/kolosalai/kolosal-server:vulkan-v0.0.1
+    image: ghcr.io/kolosalai/kolosal-server:vulkan-v0.0.1
     deploy:
       resources:
         reservations:

@@ -1,0 +1,180 @@
+# Example production values for Kolosal Platform
+
+# Global settings
+global:
+  # Set this to your actual external URL/IP
+  externalUrl: "https://api.example.com"
+  
+  # Use a specific storage class for production
+  storageClass: "fast-ssd"
+  
+  # Image pull secrets if using private registry
+  imagePullSecrets:
+    - name: registry-secret
+
+# Qdrant configuration
+qdrant:
+  enabled: true
+  persistence:
+    size: 50Gi  # Increased for production
+  resources:
+    requests:
+      cpu: 1
+      memory: 4Gi
+    limits:
+      cpu: 4
+      memory: 16Gi
+
+# Optional services configuration
+markitdown:
+  enabled: true  # Enable document conversion
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 4Gi
+
+docling:
+  enabled: false  # Disable if not needed
+
+# Kolosal Server - GPU inference
+kolosalServer:
+  enabled: true
+  
+  # Use NodePort for bare metal clusters
+  service:
+    type: NodePort
+    nodePort: 30080
+  
+  # Model storage
+  persistence:
+    models:
+      size: 200Gi  # Adjust based on your models
+      storageClass: "fast-nvme"  # Use fast storage for models
+  
+  # Autoscaling based on GPU utilization
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+    metrics:
+      - type: Resource
+        resource:
+          name: gpu
+          target:
+            type: Utilization
+            averageUtilization: 70
+  
+  # GPU resources
+  resources:
+    requests:
+      cpu: 4
+      memory: 32Gi
+      nvidia.com/gpu: 1
+    limits:
+      cpu: 8
+      memory: 64Gi
+      nvidia.com/gpu: 1
+  
+  # Node affinity for GPU nodes
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: nvidia.com/gpu
+            operator: Exists
+          - key: gpu-type
+            operator: In
+            values: ["a100", "a6000"]  # Prefer specific GPU types
+  
+  # Configuration overrides
+  config:
+    server:
+      idle_timeout: 600  # Increased for long-running requests
+    
+    auth:
+      require_api_key: true  # Always enable in production
+      rate_limit:
+        max_requests: 1000  # Increased for production
+        window_size: 60
+    
+    logging:
+      level: INFO  # Use INFO or WARN in production
+      access_log: true  # Enable for monitoring
+    
+    database:
+      qdrant:
+        timeout: 60  # Increased timeout
+        max_connections: 20  # More connections for production
+    
+    # Add more models
+    models:
+      - id: qwen3-embedding-4b
+        path: https://huggingface.co/kolosal/qwen3-embedding-4b/resolve/main/Qwen3-Embedding-4B-Q4_K_M.gguf
+        type: embedding
+        load_immediately: true
+        main_gpu_id: 0
+        inference_engine: llama-vulkan
+        load_params:
+          n_ctx: 8192  # Increased context
+          n_gpu_layers: -1  # Use all layers
+          n_batch: 4096  # Larger batch size
+          n_ubatch: 1024
+
+# Dashboard
+dashboard:
+  enabled: true
+  
+  # Use LoadBalancer for cloud environments
+  service:
+    type: LoadBalancer
+    # type: NodePort
+    # nodePort: 30300
+  
+  # High availability
+  replicaCount: 3
+  
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1
+      memory: 2Gi
+
+# Security settings
+secrets:
+  apiKeys:
+    - name: production-api-key
+      value: ""  # Generate with: openssl rand -base64 32
+    - name: monitoring-api-key  
+      value: ""  # For monitoring systems
+  
+  # Qdrant authentication
+  qdrantApiKey: ""  # Generate a secure key
+
+# Pod annotations for monitoring
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8080"
+  prometheus.io/path: "/metrics"
+
+# Health check tuning for production
+healthCheck:
+  livenessProbe:
+    initialDelaySeconds: 60  # More time for model loading
+    periodSeconds: 30
+    timeoutSeconds: 10
+    failureThreshold: 5
+  readinessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3

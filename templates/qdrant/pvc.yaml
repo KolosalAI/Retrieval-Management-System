@@ -1,0 +1,18 @@
+{{- if and .Values.qdrant.enabled .Values.qdrant.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "kolosal-platform.fullname" . }}-qdrant
+  labels:
+    {{- include "kolosal-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: qdrant
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.qdrant.persistence.size }}
+  {{- if or .Values.qdrant.persistence.storageClass (include "kolosal-platform.storageClass" .) }}
+  storageClassName: {{ .Values.qdrant.persistence.storageClass | default (include "kolosal-platform.storageClass" .) }}
+  {{- end }}
+{{- end }}

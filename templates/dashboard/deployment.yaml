@@ -1,0 +1,102 @@
+{{- if .Values.dashboard.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kolosal-platform.fullname" . }}-dashboard
+  labels:
+    {{- include "kolosal-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: dashboard
+spec:
+  replicas: {{ .Values.dashboard.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "kolosal-platform.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: dashboard
+  template:
+    metadata:
+      labels:
+        {{- include "kolosal-platform.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: dashboard
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if or .Values.qdrant.enabled .Values.kolosalServer.enabled }}
+      initContainers:
+        - name: wait-for-services
+          image: busybox:1.35
+          command: ['sh', '-c']
+          args:
+            - |
+              {{- if .Values.qdrant.enabled }}
+              until wget -q --spider http://{{ include "kolosal-platform.qdrant.serviceName" . }}:{{ .Values.qdrant.service.httpPort }}/
+              do
+                echo "Waiting for Qdrant to be ready..."
+                sleep 5
+              done
+              echo "Qdrant is ready!"
+              {{- end }}
+              {{- if .Values.kolosalServer.enabled }}
+              until wget -q --spider http://{{ include "kolosal-platform.kolosalServer.serviceName" . }}:{{ .Values.kolosalServer.service.port }}/v1/health
+              do
+                echo "Waiting for Kolosal Server to be ready..."
+                sleep 5
+              done
+              echo "Kolosal Server is ready!"
+              {{- end }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.dashboard.securityContext | nindent 8 }}
+      containers:
+        - name: dashboard
+          image: "{{ .Values.dashboard.image.repository }}:{{ .Values.dashboard.image.tag }}"
+          imagePullPolicy: {{ .Values.dashboard.image.pullPolicy }}
+          env:
+            - name: PORT
+              value: {{ .Values.dashboard.service.port | quote }}
+            - name: API_BASE_URL
+              {{- if .Values.global.externalUrl }}
+              value: {{ .Values.global.externalUrl | quote }}
+              {{- else if .Values.kolosalServer.enabled }}
+              value: "http://EXTERNAL_IP:{{ .Values.kolosalServer.service.port }}"
+              {{- else }}
+              value: "http://localhost:{{ .Values.kolosalServer.service.port }}"
+              {{- end }}
+            - name: DOCLING_BASE_URL
+              {{- if .Values.global.externalUrl }}
+              value: "{{ .Values.global.externalUrl }}/docling"
+              {{- else if .Values.docling.enabled }}
+              value: "http://EXTERNAL_IP:{{ .Values.docling.service.port }}"
+              {{- else }}
+              value: "http://localhost:{{ .Values.docling.service.port }}"
+              {{- end }}
+            - name: MARKITDOWN_BASE_URL
+              {{- if .Values.global.externalUrl }}
+              value: "{{ .Values.global.externalUrl }}/markitdown"
+              {{- else if .Values.markitdown.enabled }}
+              value: "http://EXTERNAL_IP:{{ .Values.markitdown.service.port }}"
+              {{- else }}
+              value: "http://localhost:{{ .Values.markitdown.service.port }}"
+              {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.dashboard.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            {{- toYaml .Values.healthCheck.livenessProbe | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            {{- toYaml .Values.healthCheck.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.dashboard.resources | nindent 12 }}
+{{- end }}

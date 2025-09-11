@@ -1,0 +1,88 @@
+{{- if .Values.kolosalServer.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "kolosal-platform.kolosalConfigName" . }}
+  labels:
+    {{- include "kolosal-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: kolosal-server
+data:
+  config.yaml: |
+    server:
+      port: {{ .Values.kolosalServer.config.server.port | quote }}
+      host: {{ .Values.kolosalServer.config.server.host | quote }}
+      idle_timeout: {{ .Values.kolosalServer.config.server.idle_timeout }}
+      allow_public_access: {{ .Values.kolosalServer.config.server.allow_public_access }}
+      allow_internet_access: {{ .Values.kolosalServer.config.server.allow_internet_access }}
+
+    logging:
+      level: {{ .Values.kolosalServer.config.logging.level }}
+      file: {{ .Values.kolosalServer.config.logging.file | quote }}
+      access_log: {{ .Values.kolosalServer.config.logging.access_log }}
+      quiet_mode: {{ .Values.kolosalServer.config.logging.quiet_mode }}
+      show_request_details: {{ .Values.kolosalServer.config.logging.show_request_details }}
+
+    auth:
+      enabled: {{ .Values.kolosalServer.config.auth.enabled }}
+      require_api_key: {{ .Values.kolosalServer.config.auth.require_api_key }}
+      api_key_header: {{ .Values.kolosalServer.config.auth.api_key_header }}
+      {{- if .Values.kolosalServer.config.auth.require_api_key }}
+      api_keys:
+        {{- range .Values.secrets.apiKeys }}
+        - {{ .name }}
+        {{- end }}
+      {{- else }}
+      api_keys:
+        - change_me_if_enabled
+      {{- end }}
+      rate_limit:
+        enabled: {{ .Values.kolosalServer.config.auth.rate_limit.enabled }}
+        max_requests: {{ .Values.kolosalServer.config.auth.rate_limit.max_requests }}
+        window_size: {{ .Values.kolosalServer.config.auth.rate_limit.window_size }}
+      cors:
+        enabled: {{ .Values.kolosalServer.config.auth.cors.enabled }}
+        allow_credentials: {{ .Values.kolosalServer.config.auth.cors.allow_credentials }}
+        max_age: {{ .Values.kolosalServer.config.auth.cors.max_age }}
+        allowed_origins: {{ toJson .Values.kolosalServer.config.auth.cors.allowed_origins }}
+        allowed_methods: {{ toJson .Values.kolosalServer.config.auth.cors.allowed_methods }}
+        allowed_headers: {{ toJson .Values.kolosalServer.config.auth.cors.allowed_headers }}
+
+    search:
+      enabled: {{ .Values.kolosalServer.config.search.enabled }}
+
+    database:
+      qdrant:
+        enabled: {{ .Values.kolosalServer.config.database.qdrant.enabled }}
+        {{- if .Values.qdrant.enabled }}
+        host: {{ include "kolosal-platform.qdrant.serviceName" . | quote }}
+        port: {{ .Values.qdrant.service.httpPort }}
+        {{- else }}
+        host: {{ .Values.kolosalServer.config.database.qdrant.host | default "localhost" | quote }}
+        port: {{ .Values.kolosalServer.config.database.qdrant.port | default 6333 }}
+        {{- end }}
+        collection_name: {{ .Values.kolosalServer.config.database.qdrant.collection_name | quote }}
+        default_embedding_model: {{ .Values.kolosalServer.config.database.qdrant.default_embedding_model | quote }}
+        timeout: {{ .Values.kolosalServer.config.database.qdrant.timeout }}
+        {{- if .Values.secrets.qdrantApiKey }}
+        api_key: "QDRANT_API_KEY_FROM_SECRET"
+        {{- else }}
+        api_key: {{ .Values.kolosalServer.config.database.qdrant.api_key | quote }}
+        {{- end }}
+        max_connections: {{ .Values.kolosalServer.config.database.qdrant.max_connections }}
+        connection_timeout: {{ .Values.kolosalServer.config.database.qdrant.connection_timeout }}
+
+    inference_engines:
+    {{- toYaml .Values.kolosalServer.config.inference_engines | nindent 6 }}
+
+    default_inference_engine: {{ .Values.kolosalServer.config.default_inference_engine }}
+
+    features:
+      health_check: {{ .Values.kolosalServer.config.features.health_check }}
+      metrics: {{ .Values.kolosalServer.config.features.metrics }}
+
+    embedding_autoscaling:
+    {{- toYaml .Values.kolosalServer.config.embedding_autoscaling | nindent 6 }}
+
+    models:
+    {{- toYaml .Values.kolosalServer.config.models | nindent 6 }}
+{{- end }}

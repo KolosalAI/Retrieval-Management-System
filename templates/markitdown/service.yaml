@@ -1,0 +1,23 @@
+{{- if .Values.markitdown.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kolosal-platform.markitdown.serviceName" . }}
+  labels:
+    {{- include "kolosal-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: markitdown
+  {{- with .Values.serviceAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.markitdown.service.type }}
+  ports:
+    - port: {{ .Values.markitdown.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "kolosal-platform.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: markitdown
+{{- end }}

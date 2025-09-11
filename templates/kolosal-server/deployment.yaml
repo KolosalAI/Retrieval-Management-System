@@ -1,0 +1,134 @@
+{{- if .Values.kolosalServer.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kolosal-platform.fullname" . }}-kolosal-server
+  labels:
+    {{- include "kolosal-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: kolosal-server
+spec:
+  {{- if not .Values.kolosalServer.autoscaling.enabled }}
+  replicas: 1
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "kolosal-platform.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: kolosal-server
+  strategy:
+    type: Recreate  # Required for GPU assignment
+  template:
+    metadata:
+      labels:
+        {{- include "kolosal-platform.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: kolosal-server
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/kolosal-server/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.qdrant.enabled }}
+      initContainers:
+        - name: wait-for-qdrant
+          image: busybox:1.35
+          command: ['sh', '-c']
+          args:
+            - |
+              until wget -q --spider http://{{ include "kolosal-platform.qdrant.serviceName" . }}:{{ .Values.qdrant.service.httpPort }}/
+              do
+                echo "Waiting for Qdrant to be ready..."
+                sleep 5
+              done
+              echo "Qdrant is ready!"
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.kolosalServer.securityContext | nindent 8 }}
+      containers:
+        - name: kolosal-server
+          image: "{{ .Values.kolosalServer.image.repository }}:{{ .Values.kolosalServer.image.tag }}"
+          imagePullPolicy: {{ .Values.kolosalServer.image.pullPolicy }}
+          command: ["/usr/bin/tini", "--"]
+          args: ["kolosal-server", "--config", "/app/config/config.yaml"]
+          env:
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: "all"
+            - name: NVIDIA_DRIVER_CAPABILITIES
+              value: "compute,utility"
+            - name: SERVER_HOST
+              value: {{ .Values.kolosalServer.config.server.host | quote }}
+            - name: SERVER_PORT
+              value: {{ .Values.kolosalServer.config.server.port | quote }}
+            - name: QDRANT_URL
+              {{- if .Values.qdrant.enabled }}
+              value: "http://{{ include "kolosal-platform.qdrant.serviceName" . }}:{{ .Values.qdrant.service.httpPort }}"
+              {{- else }}
+              value: "http://{{ .Values.kolosalServer.config.database.qdrant.host | default "localhost" }}:{{ .Values.kolosalServer.config.database.qdrant.port | default 6333 }}"
+              {{- end }}
+            - name: KOL_MODELS_DIR
+              value: "/app/models"
+            {{- if and .Values.kolosalServer.config.auth.require_api_key .Values.secrets.apiKeys }}
+            {{- range $index, $apiKey := .Values.secrets.apiKeys }}
+            - name: API_KEY_{{ $index }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kolosal-platform.apiKeysSecretName" $ }}
+                  key: api-key-{{ $index }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.secrets.qdrantApiKey }}
+            - name: QDRANT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kolosal-platform.apiKeysSecretName" . }}
+                  key: qdrant-api-key
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.kolosalServer.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /v1/health
+              port: http
+            {{- toYaml .Values.healthCheck.livenessProbe | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /v1/health
+              port: http
+            {{- toYaml .Values.healthCheck.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.kolosalServer.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /app/config
+              readOnly: true
+            {{- if .Values.kolosalServer.persistence.models.enabled }}
+            - name: models
+              mountPath: {{ .Values.kolosalServer.persistence.models.mountPath }}
+            {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "kolosal-platform.kolosalConfigName" . }}
+        {{- if .Values.kolosalServer.persistence.models.enabled }}
+        - name: models
+          persistentVolumeClaim:
+            claimName: {{ include "kolosal-platform.fullname" . }}-kolosal-models
+        {{- end }}
+      {{- with .Values.kolosalServer.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.kolosalServer.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.kolosalServer.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

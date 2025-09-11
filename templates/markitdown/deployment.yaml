@@ -6,6 +6,7 @@ metadata:
   labels:
     {{- include "kolosal-platform.labels" . | nindent 4 }}
     app.kubernetes.io/component: markitdown
+  app.kubernetes.io/name: retrieval-management-system
 spec:
   {{- if not .Values.markitdown.autoscaling.enabled }}
   replicas: 1

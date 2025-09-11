@@ -6,6 +6,7 @@ metadata:
   labels:
     {{- include "kolosal-platform.labels" . | nindent 4 }}
     app.kubernetes.io/component: kolosal-server
+  app.kubernetes.io/name: retrieval-management-system
 spec:
   {{- if not .Values.kolosalServer.autoscaling.enabled }}
   replicas: 1

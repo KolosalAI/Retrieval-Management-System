@@ -104,17 +104,17 @@ cd Retrieval-Management-System
 # 2. Start all services
 
 # Install with default values
-helm install kolosal-platform ./kolosal-platform
+helm install retrieval-management-system .
 
 # Install with custom values
-helm install kolosal-platform ./kolosal-platform -f custom-values.yaml
+helm install retrieval-management-system . -f custom-values.yaml
 ```
 
 Important: Setting External URL
 The dashboard requires an external URL to connect to the API. Set this during installation:
 
 ```bash
-helm install kolosal-platform ./kolosal-platform \
+helm install retrieval-management-system . \
   --set global.externalUrl=http://YOUR-EXTERNAL-IP-OR-DOMAIN
 ```
 
@@ -133,7 +133,7 @@ docling:
   enabled: true  # Set to false to disable
 
 # Disable both:
-helm install kolosal-platform ./kolosal-platform \
+helm install retrieval-management-system . \
   --set markitdown.enabled=false \
   --set docling.enabled=false
 ```
@@ -239,7 +239,7 @@ kolosalServer:
 ### Upgrade the Release
 
 ```bash
-helm upgrade kolosal-platform ./kolosal-platform \
+helm upgrade retrieval-management-system . \
   -f custom-values.yaml
 ```
 
@@ -247,10 +247,10 @@ helm upgrade kolosal-platform ./kolosal-platform \
 
 ```bash
 # Get all pods
-kubectl get pods -l app.kubernetes.io/instance=kolosal-platform
+kubectl get pods -l app.kubernetes.io/instance=retrieval-management-system
 
 # Get services
-kubectl get svc -l app.kubernetes.io/instance=kolosal-platform
+kubectl get svc -l app.kubernetes.io/instance=retrieval-management-system
 
 # Check HPA status
 kubectl get hpa
@@ -270,10 +270,10 @@ kubectl logs -l app.kubernetes.io/component=qdrant
 
 ```bash
 # Forward kolosal-server
-kubectl port-forward svc/kolosal-platform-kolosal-server 8080:8080
+kubectl port-forward svc/retrieval-management-system-kolosal-server 8080:8080
 
 # Forward dashboard
-kubectl port-forward svc/kolosal-platform-dashboard 3000:3000
+kubectl port-forward svc/retrieval-management-system-dashboard 3000:3000
 ```
 
 ### Values Reference

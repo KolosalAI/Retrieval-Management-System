@@ -6,6 +6,7 @@ metadata:
   labels:
     {{- include "kolosal-platform.labels" . | nindent 4 }}
     app.kubernetes.io/component: dashboard
+  app.kubernetes.io/name: retrieval-management-system
 spec:
   replicas: {{ .Values.dashboard.replicaCount }}
   selector:

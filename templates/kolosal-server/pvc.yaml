@@ -1,0 +1,18 @@
+{{- if and .Values.kolosalServer.enabled .Values.kolosalServer.persistence.models.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "kolosal-platform.fullname" . }}-kolosal-models
+  labels:
+    {{- include "kolosal-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: kolosal-server
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.kolosalServer.persistence.models.size }}
+  {{- if or .Values.kolosalServer.persistence.models.storageClass (include "kolosal-platform.storageClass" .) }}
+  storageClassName: {{ .Values.kolosalServer.persistence.models.storageClass | default (include "kolosal-platform.storageClass" .) }}
+  {{- end }}
+{{- end }}

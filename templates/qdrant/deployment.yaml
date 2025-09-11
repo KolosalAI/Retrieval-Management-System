@@ -1,0 +1,79 @@
+{{- if .Values.qdrant.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kolosal-platform.fullname" . }}-qdrant
+  labels:
+    {{- include "kolosal-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: qdrant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "kolosal-platform.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: qdrant
+  strategy:
+    type: Recreate  # Required for PVC
+  template:
+    metadata:
+      labels:
+        {{- include "kolosal-platform.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: qdrant
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.qdrant.securityContext | nindent 8 }}
+      containers:
+        - name: qdrant
+          image: "{{ .Values.qdrant.image.repository }}:{{ .Values.qdrant.image.tag }}"
+          imagePullPolicy: {{ .Values.qdrant.image.pullPolicy }}
+          env:
+            - name: QDRANT__SERVICE__HTTP_PORT
+              value: "{{ .Values.qdrant.service.httpPort }}"
+            - name: QDRANT__SERVICE__GRPC_PORT
+              value: "{{ .Values.qdrant.service.grpcPort }}"
+            {{- if .Values.secrets.qdrantApiKey }}
+            - name: QDRANT__SERVICE__API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kolosal-platform.apiKeysSecretName" . }}
+                  key: qdrant-api-key
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.qdrant.service.httpPort }}
+              protocol: TCP
+            - name: grpc
+              containerPort: {{ .Values.qdrant.service.grpcPort }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            {{- toYaml .Values.healthCheck.livenessProbe | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            {{- toYaml .Values.healthCheck.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.qdrant.resources | nindent 12 }}
+          {{- if .Values.qdrant.persistence.enabled }}
+          volumeMounts:
+            - name: storage
+              mountPath: {{ .Values.qdrant.persistence.mountPath }}
+          {{- end }}
+      {{- if .Values.qdrant.persistence.enabled }}
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: {{ include "kolosal-platform.fullname" . }}-qdrant
+      {{- end }}
+{{- end }}

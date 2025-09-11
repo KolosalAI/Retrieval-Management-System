@@ -1,0 +1,60 @@
+{{- if and .Values.qdrant.enabled .Values.qdrant.init.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "kolosal-platform.fullname" . }}-qdrant-init
+  labels:
+    {{- include "kolosal-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: qdrant-init
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        {{- include "kolosal-platform.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: qdrant-init
+    spec:
+      restartPolicy: OnFailure
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: wait-for-qdrant
+          image: busybox:1.35
+          command: ['sh', '-c']
+          args:
+            - |
+              until wget -q --spider http://{{ include "kolosal-platform.qdrant.serviceName" . }}:{{ .Values.qdrant.service.httpPort }}/
+              do
+                echo "Waiting for Qdrant to be ready..."
+                sleep 5
+              done
+              echo "Qdrant is ready!"
+      containers:
+        - name: qdrant-init
+          image: "{{ .Values.qdrant.init.image.repository }}:{{ .Values.qdrant.init.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: QDRANT_URL
+              value: "http://{{ include "kolosal-platform.qdrant.serviceName" . }}:{{ .Values.qdrant.service.httpPort }}"
+            {{- if .Values.secrets.qdrantApiKey }}
+            - name: QDRANT__SERVICE__API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kolosal-platform.apiKeysSecretName" . }}
+                  key: qdrant-api-key
+            {{- end }}
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+{{- end }}

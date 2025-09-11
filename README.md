@@ -46,7 +46,7 @@ This system integrates the following components:
 ## Helm Chart Structure
 
 ```
-kolosal-platform/
+retrieval-management-system/
 ├── Chart.yaml                    # Chart metadata
 ├── values.yaml                   # Default configuration values
 ├── values-production.yaml        # Example production values

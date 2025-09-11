@@ -1,0 +1,16 @@
+apiVersion: v2
+name: kolosal-retrieval-management-system
+description: A Helm chart for Kolosal Retrieval Management System with GPU-accelerated inference
+type: application
+version: 0.1.0
+appVersion: "v0.0.1"
+keywords:
+  - ai
+  - llm
+  - embedding
+  - gpu
+  - inference
+maintainers:
+  - name: Kolosal AI
+    email: dev@kolosal.ai
+dependencies: []

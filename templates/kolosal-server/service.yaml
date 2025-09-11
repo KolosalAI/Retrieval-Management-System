@@ -1,0 +1,26 @@
+{{- if .Values.kolosalServer.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kolosal-platform.kolosalServer.serviceName" . }}
+  labels:
+    {{- include "kolosal-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: kolosal-server
+  {{- with .Values.serviceAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.kolosalServer.service.type }}
+  ports:
+    - port: {{ .Values.kolosalServer.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+      {{- if and (eq .Values.kolosalServer.service.type "NodePort") .Values.kolosalServer.service.nodePort }}
+      nodePort: {{ .Values.kolosalServer.service.nodePort }}
+      {{- end }}
+  selector:
+    {{- include "kolosal-platform.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: kolosal-server
+{{- end }}

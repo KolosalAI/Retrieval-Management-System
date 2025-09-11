@@ -1,0 +1,53 @@
+{{- if .Values.docling.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kolosal-platform.fullname" . }}-docling
+  labels:
+    {{- include "kolosal-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: docling
+spec:
+  {{- if not .Values.docling.autoscaling.enabled }}
+  replicas: 1
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "kolosal-platform.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: docling
+  template:
+    metadata:
+      labels:
+        {{- include "kolosal-platform.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: docling
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.docling.securityContext | nindent 8 }}
+      containers:
+        - name: docling
+          image: "{{ .Values.docling.image.repository }}:{{ .Values.docling.image.tag }}"
+          imagePullPolicy: {{ .Values.docling.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.docling.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            {{- toYaml .Values.healthCheck.livenessProbe | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            {{- toYaml .Values.healthCheck.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.docling.resources | nindent 12 }}
+{{- end }}

@@ -1,4 +1,4 @@
-# Kolosal AI RMS - GitIgnore File
+# Kolosal Retrieval Management System - .gitignore
 
 # Docker & Compose
 .docker/

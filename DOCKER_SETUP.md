@@ -1,6 +1,6 @@
 # Docker Setup Guide
 
-This guide explains how to set up and run the Kolosal AI Retrieval Management System using Docker Compose.
+This guide explains how to set up and run the Kolosal Retrieval Management System using Docker Compose.
 
 ## Prerequisites
 
@@ -73,7 +73,7 @@ The system consists of 4 main services (prebuilt images):
    - Handles LLM inference, embeddings, and RAG operations
 
 2. **Dashboard** (Port 3000)
-   - Built from [Kolosal-RMS-Dashboard](https://github.com/KolosalAI/Kolosal-RMS-Dashboard)
+   - Built from [Kolosal Retrieval Management System Dashboard](https://github.com/KolosalAI/Kolosal-RMS-Dashboard)
    - Unified control panel for all services
 
 3. **Qdrant** (Port 6333)
@@ -81,7 +81,7 @@ The system consists of 4 main services (prebuilt images):
    - Stores document embeddings for RAG operations
 
 4. **MarkItDown** (Port 8081)
-   - Built from [Kolosal-RMS-MarkItDown](https://github.com/KolosalAI/Kolosal-RMS-MarkItDown)
+   - Built from [Kolosal Retrieval Management System MarkItDown](https://github.com/KolosalAI/Kolosal-RMS-MarkItDown)
    - Converts documents to markdown
 
 <!-- Internet search (e.g., SearXNG) can be added separately if needed. -->

@@ -38,8 +38,8 @@ This Helm chart deploys the Kolosal Retrieval Management System on Kubernetes wi
 This system integrates the following components:
 
 - **[Kolosal Inference Engine](https://github.com/KolosalAI/kolosal-server)** - LLM inference server (prebuilt image)
-- **[Kolosal RMS Dashboard](https://github.com/KolosalAI/Kolosal-RMS-Dashboard)** - Web-based management interface (prebuilt image)
-- **[Kolosal RMS MarkItDown](https://github.com/KolosalAI/Kolosal-RMS-MarkItDown)** - Document parsing service (prebuilt image)
+- **[Kolosal Retrieval Management System Dashboard](https://github.com/KolosalAI/Kolosal-RMS-Dashboard)** - Web-based management interface (prebuilt image)
+- **[Kolosal Retrieval Management System MarkItDown](https://github.com/KolosalAI/Kolosal-RMS-MarkItDown)** - Document parsing service (prebuilt image)
 - **[Qdrant Vector Database](https://github.com/qdrant/qdrant)** - High-performance vector database
 <!-- Internet search is optional and not included by default -->
 

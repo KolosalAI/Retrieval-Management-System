@@ -1,0 +1,33 @@
+{{- if and .Values.docling.enabled .Values.docling.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "kolosal-platform.fullname" . }}-docling
+  labels:
+    {{- include "kolosal-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: docling
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "kolosal-platform.fullname" . }}-docling
+  minReplicas: {{ .Values.docling.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.docling.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.docling.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.docling.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.docling.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.docling.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

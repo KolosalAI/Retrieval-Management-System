@@ -27,7 +27,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if or .Values.qdrant.enabled .Values.kolosalServer.enabled }}
+      {{- if or .Values.qdrant.enabled .Values.kolosalServer.enabled .Values.markitdown.enabled }}
       initContainers:
         - name: wait-for-services
           image: busybox:1.35
@@ -41,6 +41,14 @@ spec:
                 sleep 5
               done
               echo "Qdrant is ready!"
+              {{- end }}
+              {{- if .Values.markitdown.enabled }}
+              until wget -q --spider http://{{ include "kolosal-platform.markitdown.serviceName" . }}:{{ .Values.markitdown.service.port }}/health
+              do
+                echo "Waiting for MarkItDown to be ready..."
+                sleep 5
+              done
+              echo "MarkItDown is ready!"
               {{- end }}
               {{- if .Values.kolosalServer.enabled }}
               until wget -q --spider http://{{ include "kolosal-platform.kolosalServer.serviceName" . }}:{{ .Values.kolosalServer.service.port }}/v1/health

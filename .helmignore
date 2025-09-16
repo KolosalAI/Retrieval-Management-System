@@ -15,7 +15,7 @@
 .vscode/
 
 # Project-specific (keep chart lean)
-assets/**
+assets/
 docker-compose.yml
 README.md
 LICENSE
@@ -23,4 +23,4 @@ values-production.yaml
 DOCKER_SETUP.md
 .github/
 .gitlab-ci.yml
-EOF
+# Removed unsupported double-star (**) pattern; Helm classic ignore doesn't support ** globbing.

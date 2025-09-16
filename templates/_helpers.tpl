@@ -67,8 +67,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{/* API keys secret name helper */}}
 {{- define "kolosal-platform.apiKeysSecretName" -}}
-{{- if .Values.apiKeysSecret.name -}}
-{{- .Values.apiKeysSecret.name | trunc 63 | trimSuffix "-" -}}
+{{- /* Defensive: .Values.apiKeysSecret may be nil or not a map */ -}}
+{{- $api := (index .Values "apiKeysSecret") | default dict -}}
+{{- $name := (index $api "name") | default "" -}}
+{{- if $name -}}
+{{- $name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- printf "%s-api-keys" (include "kolosal-platform.fullname" .) | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
@@ -76,13 +79,18 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{/* Optional storageClass override (cluster default if empty) */}}
 {{- define "kolosal-platform.storageClass" -}}
-{{- .Values.global.storageClass | default "" -}}
+{{- /* .Values.global may be nil */ -}}
+{{- $global := (index .Values "global") | default dict -}}
+{{- (index $global "storageClass") | default "" -}}
 {{- end -}}
 
 {{/* ConfigMap name for kolosal server configuration */}}
 {{- define "kolosal-platform.kolosalConfigName" -}}
-{{- if .Values.kolosalServer.config.name -}}
-{{- .Values.kolosalServer.config.name | trunc 63 | trimSuffix "-" -}}
+{{- $kolosalServer := (index .Values "kolosalServer") | default dict -}}
+{{- $cfg := (index $kolosalServer "config") | default dict -}}
+{{- $cfgName := (index $cfg "name") | default "" -}}
+{{- if $cfgName -}}
+{{- $cfgName | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- printf "%s-config" (include "kolosal-platform.fullname" .) | trunc 63 | trimSuffix "-" -}}
 {{- end -}}

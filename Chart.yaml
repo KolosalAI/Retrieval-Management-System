@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: v2
 name: kolosal-retrieval-management-system
 description: A Helm chart for Kolosal Retrieval Management System with GPU-accelerated inference
 type: application

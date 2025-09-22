@@ -283,9 +283,9 @@ dashboard:
     nodePort: 30300  # Only used if type is NodePort
   
   env:
-    API_BASE_URL: "http://192.168.49.2:8084"
-    DOCLING_BASE_URL: "http://192.168.49.2:5001"
-    MARKITDOWN_BASE_URL: "http://192.168.49.2:8081"
+    API_BASE_URL: "http://public-ip:8084"
+    DOCLING_BASE_URL: "http://public-ip:5001"
+    MARKITDOWN_BASE_URL: "http://public-ip:8081"
   
   replicaCount: 2  # For HA
   

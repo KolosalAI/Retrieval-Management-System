@@ -17,6 +17,9 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+      {{- if and (eq .Values.docling.service.type "NodePort") .Values.docling.service.nodePort }}
+      nodePort: {{ .Values.docling.service.nodePort }}
+      {{- end }}
   selector:
     {{- include "kolosal-platform.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: docling

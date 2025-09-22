@@ -33,19 +33,19 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- if .Values.qdrant.enabled }}
-      initContainers:
-        - name: wait-for-qdrant
-          image: busybox:1.35
-          command: ['sh', '-c']
-          args:
-            - |
-              until wget -q --spider http://{{ include "kolosal-platform.qdrant.serviceName" . }}:{{ .Values.qdrant.service.httpPort }}/
-              do
-                echo "Waiting for Qdrant to be ready..."
-                sleep 5
-              done
-              echo "Qdrant is ready!"
-      {{- end }}
+      # initContainers:
+      #   - name: wait-for-qdrant
+      #     image: busybox:1.35
+      #     command: ['sh', '-c']
+      #     args:
+      #       - |
+      #         until wget -q --spider http://{{ include "kolosal-platform.qdrant.serviceName" . }}:{{ .Values.qdrant.service.httpPort }}/
+      #         do
+      #           echo "Waiting for Qdrant to be ready..."
+      #           sleep 5
+      #         done
+      #         echo "Qdrant is ready!"
+      # {{- end }}
       securityContext:
         {{- toYaml .Values.kolosalServer.securityContext | nindent 8 }}
       containers:

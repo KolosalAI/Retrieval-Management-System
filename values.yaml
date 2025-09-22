@@ -19,7 +19,7 @@ qdrant:
     pullPolicy: IfNotPresent
   
   service:
-    type: ClusterIP
+    type: NodePort  # Or NodePort for external access
     httpPort: 6333
     grpcPort: 6334
   
@@ -38,16 +38,16 @@ qdrant:
       memory: 4Gi
   
   securityContext:
-    runAsNonRoot: true
-    runAsUser: 1000
-    fsGroup: 1000
+  runAsUser: 0
+  runAsGroup: 0
+  fsGroup: 0
 
-  # Qdrant initialization job
-  init:
-    enabled: true
-    image:
-      repository: ghcr.io/kolosalai/qdrant-init
-      tag: v0.0.1
+  # # Qdrant initialization job
+  # init:
+  #   enabled: true
+  #   image:
+  #     repository: ghcr.io/kolosalai/qdrant-init
+  #     tag: v0.0.1
 
 # MarkItDown Service
 markitdown:
@@ -58,7 +58,7 @@ markitdown:
     pullPolicy: IfNotPresent
   
   service:
-    type: ClusterIP
+    type: NodePort  # Or NodePort for external access
     port: 8081
   
   autoscaling:
@@ -80,7 +80,7 @@ markitdown:
     runAsNonRoot: true
     runAsUser: 1000
 
-# Docling Service
+# # Docling Service
 docling:
   enabled: true
   image:
@@ -89,8 +89,9 @@ docling:
     pullPolicy: IfNotPresent
   
   service:
-    type: ClusterIP
+    type: NodePort  # Or NodePort for external access
     port: 5001
+    nodePort: 30085
   
   autoscaling:
     enabled: true
@@ -111,7 +112,7 @@ docling:
     runAsNonRoot: true
     runAsUser: 1000
 
-# Kolosal Server (AI Inference Engine)
+# # Kolosal Server (AI Inference Engine)
 kolosalServer:
   enabled: true
   image:
@@ -120,8 +121,8 @@ kolosalServer:
     pullPolicy: IfNotPresent
   
   service:
-    type: LoadBalancer  # Or NodePort for external access
-    port: 8080
+    type: NodePort  # Or NodePort for external access
+    port: 8084
     nodePort: 30084  # Only used if type is NodePort
   
   persistence:
@@ -149,25 +150,25 @@ kolosalServer:
             type: Utilization
             averageUtilization: 80
   
-  resources:
-    requests:
-      cpu: 2
-      memory: 8Gi
-      nvidia.com/gpu: 1
-    limits:
-      cpu: 4
-      memory: 16Gi
-      nvidia.com/gpu: 1
+  # resources:
+  #   requests:
+  #     cpu: 2
+  #     memory: 8Gi
+  #     nvidia.com/gpu: 1
+  #   limits:
+  #     cpu: 4
+  #     memory: 16Gi
+  #     nvidia.com/gpu: 1
   
-  nodeSelector: {}
-  tolerations: []
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-        - matchExpressions:
-          - key: nvidia.com/gpu
-            operator: Exists
+  # nodeSelector: {}
+  # tolerations: []
+  # affinity:
+  #   nodeAffinity:
+  #     requiredDuringSchedulingIgnoredDuringExecution:
+  #       nodeSelectorTerms:
+  #       - matchExpressions:
+  #         - key: nvidia.com/gpu
+  #           operator: Exists
   
   securityContext:
     runAsNonRoot: true
@@ -191,9 +192,9 @@ kolosalServer:
       show_request_details: false
     
     auth:
-      enabled: true
-      require_api_key: true
-      api_key_header: X-API-Key
+      enabled: false
+      require_api_key: false
+      # api_key_header: X-API-Key
       # API keys will be stored in secrets
       rate_limit:
         enabled: true
@@ -268,7 +269,7 @@ kolosalServer:
           n_batch: 2048
           n_ubatch: 512
 
-# Dashboard Service
+# # Dashboard Service
 dashboard:
   enabled: true
   image:
@@ -277,9 +278,14 @@ dashboard:
     pullPolicy: IfNotPresent
   
   service:
-    type: LoadBalancer  # Or NodePort for external access
+    type: NodePort  # Or NodePort for external access
     port: 3000
     nodePort: 30300  # Only used if type is NodePort
+  
+  env:
+    API_BASE_URL: "http://192.168.49.2:8084"
+    DOCLING_BASE_URL: "http://192.168.49.2:5001"
+    MARKITDOWN_BASE_URL: "http://192.168.49.2:8081"
   
   replicaCount: 2  # For HA
   

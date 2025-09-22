@@ -72,7 +72,7 @@ spec:
               {{- if .Values.global.externalUrl }}
               value: {{ .Values.global.externalUrl | quote }}
               {{- else if .Values.kolosalServer.enabled }}
-              value: "http://EXTERNAL_IP:{{ .Values.kolosalServer.service.port }}"
+              value: {{ .Values.dashboard.env.API_BASE_URL | quote }}
               {{- else }}
               value: "http://localhost:{{ .Values.kolosalServer.service.port }}"
               {{- end }}
@@ -80,7 +80,7 @@ spec:
               {{- if .Values.global.externalUrl }}
               value: "{{ .Values.global.externalUrl }}/docling"
               {{- else if .Values.docling.enabled }}
-              value: "http://EXTERNAL_IP:{{ .Values.docling.service.port }}"
+              value: {{ .Values.dashboard.env.DOCLING_BASE_URL | quote }}
               {{- else }}
               value: "http://localhost:{{ .Values.docling.service.port }}"
               {{- end }}
@@ -88,7 +88,7 @@ spec:
               {{- if .Values.global.externalUrl }}
               value: "{{ .Values.global.externalUrl }}/markitdown"
               {{- else if .Values.markitdown.enabled }}
-              value: "http://EXTERNAL_IP:{{ .Values.markitdown.service.port }}"
+              value: {{ .Values.dashboard.env.MARKITDOWN_BASE_URL | quote }}
               {{- else }}
               value: "http://localhost:{{ .Values.markitdown.service.port }}"
               {{- end }}
